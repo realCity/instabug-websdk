@@ -10,10 +10,10 @@ describe('Bug Reporting Module', () => {
   };
 
   beforeEach(() => {
-    const fakeElement = document.createElement('div');
     const fakeForm = document.createElement('form');
     const fakeEmail = document.createElement('input');
     const fakeComment = document.createElement('input');
+    const fakeExtraFile = document.createElement('input');
 
     jasmine.Ajax.install();
 
@@ -26,10 +26,21 @@ describe('Bug Reporting Module', () => {
     fakeComment.type = 'text';
     fakeComment.name = 'comment';
     fakeComment.value = 'fake comment';
+    fakeExtraFile.type = 'file';
+    fakeExtraFile.name = 'image';
+    fakeExtraFile.id = 'extra-image';
     fakeForm.appendChild(fakeEmail);
     fakeForm.appendChild(fakeComment);
-
-    spyOn(document, 'getElementById').and.returnValues(fakeForm, false, fakeElement);
+    fakeForm.appendChild(fakeExtraFile);
+    spyOn(document, 'getElementById').and.callFake((id) => {
+      switch (id) {
+        case 'instabugForm':
+          return fakeForm;
+        case 'extra-image':
+          return fakeExtraFile;
+      }
+      return null;
+    });
 
     jasmine.Ajax.stubRequest('/api/1').andReturn(response);
     jasmine.Ajax.stubRequest('https://api.cloudinary.com/v1_1/fakeId/upload').andReturn(response);

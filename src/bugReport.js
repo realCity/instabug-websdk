@@ -69,14 +69,17 @@ function _uploadBugScreenshot() {
   if (!drawingCanvas) return false;
 
   const image = drawingCanvas.toDataURL('image/png');
-  const formData = new FormData();
   const blob = utils.dataURItoBlob(image);
+  return uploadImage(blob, 'image.png');
+}
+
+function uploadImage(file, filename) {
+  const formData = new FormData();
   const cloudName = IntegrationData.cloudinaryCloudName;
   const uploadPreset = IntegrationData.cloudinaryUploadPreset;
 
-
   formData.append('metadata[file_type]', 'main-screenshot');
-  formData.append('file', blob, 'image.png');
+  formData.append('file', file, filename);
   formData.append('upload_preset', uploadPreset);
   formData.append('tags', 'instabug_screenshot');
 
@@ -91,6 +94,22 @@ function _uploadBugScreenshot() {
   });
 }
 
+function uploadExtraImage() {
+  const extraImage = document.getElementById('extra-image');
+  if (extraImage.files.length === 0) {
+    return false;
+  }
+  return uploadImage(extraImage.files[0], 'extra.png');
+}
+
+function uploadBugImages() {
+  const uploads = [
+    _uploadBugScreenshot(),
+    uploadExtraImage(),
+  ].filter(u => u); // filter false values
+
+  return Promise.all(uploads);
+}
 
 /**
  * getMemoryUsed - get current memory used by browser
@@ -185,7 +204,7 @@ function _prepareBugReportRequest(bugReportDetails, webHookURL) {
 
 function submitBugReport() {
   const bugReport = prepareBugReport();
-  const uploadScreenshotRequest = _uploadBugScreenshot();
+  const bugImagesUpload = uploadBugImages();
   const zapierWebhookUrl = IntegrationData.zapierWebhookUrl;
 
   elem.hide('#instabugFormContainer');
@@ -193,25 +212,22 @@ function submitBugReport() {
 
   // if no screenshot attached with the report, submit it direct, but if you found a screenshot
   // upload it first, include its url the submit the report
-  if (!uploadScreenshotRequest) {
+  bugImagesUpload.then((responses) => {
+    bugReport.screenshots = responses.map((response) => {
+      if (response.status === 'OK' && response.data && response.data.secure_url) {
+        return response.data.secure_url;
+      }
+      return response;
+    });
+    bugReport.screenshotsText = bugReport.screenshots
+      .map((screenshot, idx) => `[Screenshot #${idx + 1}|${screenshot}]`).join('\n');
+  }).finally(() => {
     _prepareBugReportRequest(bugReport, zapierWebhookUrl)
       .finally(() => {
         elem.hide('#instabugLoading');
         elem.show('#instabugThankYouPage');
       });
-  } else {
-    uploadScreenshotRequest.then((response) => {
-      if (response.status === 'OK' && response.data && response.data.secure_url) {
-        bugReport.screenshot = response.data.secure_url;
-      }
-    }).finally(() => {
-      _prepareBugReportRequest(bugReport, zapierWebhookUrl)
-        .finally(() => {
-          elem.hide('#instabugLoading');
-          elem.show('#instabugThankYouPage');
-        });
-    });
-  }
+  });
 }
 
 module.exports = {

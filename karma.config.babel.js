@@ -81,10 +81,10 @@ module.exports = (config) => {
     coverageReporter: {
       dir: 'coverage/',
       reporters: [
-        {
-          type: 'html',
-          subdir: 'html-coverage-report',
-        },
+        // {
+        //   type: 'html',
+        //   subdir: 'html-coverage-report',
+        // },
         {
           type: 'text',
         },

@@ -90,12 +90,18 @@ function init(options) {
 function renderScreenshot(image) {
   const drawingCanvas = document.getElementById('drawingCanvas');
   const context = drawingCanvas.getContext('2d');
-  const screenshot = document.createElement('img');
 
-  screenshot.setAttribute('src', image);
-  screenshot.onload = () => {
+  if (typeof image === 'string') {
+    const screenshot = document.createElement('img');
+    screenshot.setAttribute('src', image);
+    screenshot.onload = () => drawScreenshot(screenshot);
+  } else {
+    drawScreenshot(image);
+  }
+
+  function drawScreenshot(screenshot) {
     context.drawImage(screenshot, 0, 0, window.innerWidth, window.innerHeight);
-  };
+  }
 
   elem.show('#instabugFormContainer');
 }

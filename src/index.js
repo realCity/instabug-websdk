@@ -6,6 +6,7 @@
 import views from './views';
 import bugReport from './bugReport';
 import element from './element';
+import extension from './extension';
 
 require('./startup');
 
@@ -25,7 +26,8 @@ if (!document.doctype) {
  * initSDK - initialize the sdk, setting up the integration tokens with uploading services
  *
  * @param  {type} options initialization object, this contains, zapier webhook url, cloudinary
- * integration data including `cloudName` and  `uploadPreset` token
+ * integration data including `cloudName` and  `uploadPreset` token.
+ * You can set html2canvas property to the html2canvas library as fallback method.
  */
 function initSDK(options) {
   if (
@@ -48,6 +50,10 @@ function initSDK(options) {
     bugReport.setCloudinaryIntegration(options.cloudinaryCloudName, options.cloudinaryUploadPreset);
   } else {
     console.error('Instabug WebSDK: Cloudinary integration info are not found');
+  }
+
+  if (options.html2canvas) {
+    extension.setHtml2canvas(options.html2canvas);
   }
 
   domReady(() => {

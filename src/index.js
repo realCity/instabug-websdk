@@ -52,6 +52,12 @@ function initSDK(options) {
     console.error('Instabug WebSDK: Cloudinary integration info are not found');
   }
 
+  if (options.noLocalStorage) {
+    bugReport.disableLocalStorage();
+  }
+
+  bugReport.setLogSource(options.logSource);
+
   if (options.html2canvas) {
     extension.setHtml2canvas(options.html2canvas);
   }

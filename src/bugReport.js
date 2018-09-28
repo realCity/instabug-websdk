@@ -17,6 +17,8 @@ import { xhr } from './xhr';
  */
 const reportStartingTime = Date.now();
 
+let attachLocalStorage = true;
+let logSource;
 
 /**
  * @const
@@ -58,6 +60,14 @@ function setCloudinaryIntegration(cloudName, uploadPreset) {
   IntegrationData.cloudinaryUploadPreset = uploadPreset;
 }
 
+function disableLocalStorage() {
+  attachLocalStorage = false;
+}
+
+function setLogSource(source) {
+  logSource = source;
+}
+
 /**
  * _uploadBugScreenshot - convert annotated screenshot to image, then upload it
  *
@@ -70,10 +80,10 @@ function _uploadBugScreenshot() {
 
   const image = drawingCanvas.toDataURL('image/png');
   const blob = utils.dataURItoBlob(image);
-  return uploadImage(blob, 'image.png');
+  return uploadCloudinary(blob, 'image.png');
 }
 
-function uploadImage(file, filename) {
+function uploadCloudinary(file, filename, extra) {
   const formData = new FormData();
   const cloudName = IntegrationData.cloudinaryCloudName;
   const uploadPreset = IntegrationData.cloudinaryUploadPreset;
@@ -82,6 +92,11 @@ function uploadImage(file, filename) {
   formData.append('file', file, filename);
   formData.append('upload_preset', uploadPreset);
   formData.append('tags', 'instabug_screenshot');
+  if (extra) {
+    Object.keys(extra).forEach((key) => {
+      formData.append(key, extra[key]);
+    });
+  }
 
   return xhr({
     method: 'POST',
@@ -99,7 +114,16 @@ function uploadExtraImage() {
   if (extraImage.files.length === 0) {
     return false;
   }
-  return uploadImage(extraImage.files[0], 'extra.png');
+  return uploadCloudinary(extraImage.files[0], 'extra.png');
+}
+
+function uploadLogFile() {
+  const text = JSON.stringify(logSource());
+  const blob = new Blob([text], {
+    type: 'application/json',
+  });
+
+  return uploadCloudinary(blob, 'network-logs.json', { resource_type: 'raw' });
 }
 
 function uploadBugImages() {
@@ -170,8 +194,7 @@ function getBrowserData() {
 function prepareBugReport() {
   const form = document.getElementById('instabugForm');
 
-  let report = {};
-  report = {
+  const report = {
     reported_at: Date.now(),
     email: form.email.value,
     title: form.comment.value,
@@ -182,9 +205,12 @@ function prepareBugReport() {
     locale: getBrowserData().locale,
     screen_size: `${window.innerWidth}x${window.innerHeight}`,
     density: window.devicePixelRatio,
-    localStorage: JSON.stringify(localStorage),
     console_log: JSON.stringify(logs.getConsoleLog()),
   };
+
+  if (attachLocalStorage) {
+    report.localStorage = JSON.stringify(localStorage);
+  }
 
   if (getMemoryUsed()) {
     report.memory = getMemoryUsed();
@@ -210,10 +236,13 @@ function submitBugReport() {
   elem.hide('#instabugFormContainer');
   elem.show('#instabugLoading');
 
-  // if no screenshot attached with the report, submit it direct, but if you found a screenshot
-  // upload it first, include its url the submit the report
-  bugImagesUpload.then((responses) => {
-    bugReport.screenshots = responses.map((response) => {
+  const uploads = [bugImagesUpload];
+  if (logSource) {
+    uploads.push(uploadLogFile());
+  }
+
+  Promise.all(uploads).then(([imageResponses, logUploadResponse]) => {
+    bugReport.screenshots = imageResponses.map((response) => {
       if (response.status === 'OK' && response.data && response.data.secure_url) {
         return response.data.secure_url;
       }
@@ -221,6 +250,10 @@ function submitBugReport() {
     });
     bugReport.screenshotsText = bugReport.screenshots
       .map((screenshot, idx) => `[Screenshot #${idx + 1}|${screenshot}]`).join('\n');
+
+    if (logUploadResponse) {
+      bugReport.networkLog = logUploadResponse.data && logUploadResponse.data.secure_url;
+    }
   }).finally(() => {
     _prepareBugReportRequest(bugReport, zapierWebhookUrl)
       .finally(() => {
@@ -233,6 +266,8 @@ function submitBugReport() {
 module.exports = {
   setZapierHookUrl,
   setCloudinaryIntegration,
+  disableLocalStorage,
+  setLogSource,
   submitBugReport,
   getBrowserData,
   getZapierHookUrl,

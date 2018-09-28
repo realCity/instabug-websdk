@@ -7,16 +7,9 @@ import views from './views';
 import bugReport from './bugReport';
 import element from './element';
 import extension from './extension';
+import translation from './translation';
 
 require('./startup');
-
-const domReady = (callback) => {
-  if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') {
-    callback();
-  } else {
-    document.addEventListener('DOMContentLoaded', callback);
-  }
-};
 
 if (!document.doctype) {
   console.error('InstaBug Fatal Err: page has no doctype declared');
@@ -56,20 +49,24 @@ function initSDK(options) {
     bugReport.disableLocalStorage();
   }
 
+  if (options.translation) {
+    translation.current = options.translation;
+  }
+
   bugReport.setLogSource(options.logSource);
 
   if (options.html2canvas) {
     extension.setHtml2canvas(options.html2canvas);
   }
 
-  domReady(() => {
-    views.addReportButton();
-    element.hide('#instabugSDK');
-  });
-
-  domReady(() => {
-    element.show('#instabugSDK');
-  });
+  // domReady(() => {
+  //   views.addReportButton();
+  //   element.hide('#instabugSDK');
+  // });
+  //
+  // domReady(() => {
+  //   element.show('#instabugSDK');
+  // });
 }
 
 

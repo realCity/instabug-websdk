@@ -65,6 +65,7 @@ document.addEventListener('screenShotCreated', () => {
 
 module.exports = {
   isInstalled,
+  pluginIsInstalled,
   takeScreenShot,
   setHtml2canvas,
 };

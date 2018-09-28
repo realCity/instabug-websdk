@@ -6,6 +6,7 @@ import elem from './element';
 import extension from './extension';
 import bugReport from './bugReport';
 import utils from './utils';
+import translation from './translation';
 
 const downloadExtensionView = require('./views/download-extension.html');
 const loadingWindowView = require('./views/loading-window.html');
@@ -14,6 +15,10 @@ const submitFormView = require('./views/submitForm.html');
 
 require('./views/styles.css');
 
+function translate(html) {
+  return html.replace(/%([^%]*)%/g, (all, prop) => translation.current[prop]);
+}
+
 function addSubmitForm() {
   const node = document.createElement('div');
 
@@ -21,8 +26,11 @@ function addSubmitForm() {
   node.setAttribute('id', 'instabugFormContainer');
   node.setAttribute('style', 'display:none;');
 
-  node.innerHTML = submitFormView;
+  node.innerHTML = translate(submitFormView);
   document.body.appendChild(node);
+  if (extension.pluginIsInstalled()) {
+    elem.hide('#download-instabug-plugin');
+  }
 }
 
 function resetAndClose() {
@@ -37,7 +45,7 @@ function addLoadingWindow() {
   node.setAttribute('class', 'ibgsdk-element instabug-window');
   node.setAttribute('id', 'instabugLoading');
   node.setAttribute('style', 'display:none;');
-  node.innerHTML = loadingWindowView;
+  node.innerHTML = translate(loadingWindowView);
   document.body.appendChild(node);
 }
 
@@ -46,7 +54,7 @@ function addThankYouPage() {
   node.setAttribute('class', 'ibgsdk-element instabug-window');
   node.setAttribute('id', 'instabugThankYouPage');
   node.setAttribute('style', 'display:none;');
-  node.innerHTML = ThankyouView;
+  node.innerHTML = translate(ThankyouView);
   document.body.appendChild(node);
 }
 

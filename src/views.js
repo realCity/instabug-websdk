@@ -19,6 +19,10 @@ function translate(html) {
   return html.replace(/%([^%]*)%/g, (all, prop) => translation.current[prop]);
 }
 
+function isImage(file) {
+  return file.name.match(/\.(png|gif|jpg|bmp|pdf)$/i);
+}
+
 function addSubmitForm() {
   const node = document.createElement('div');
 
@@ -28,6 +32,11 @@ function addSubmitForm() {
 
   node.innerHTML = translate(submitFormView);
   document.body.appendChild(node);
+  const extraImage = document.getElementById('extra-image');
+  extraImage.addEventListener('change', () => {
+    const fileError = extraImage.files.length && !isImage(extraImage.files[0]);
+    document.getElementById('extra-image-error').style.display = fileError ? null : 'none';
+  });
   if (extension.pluginIsInstalled()) {
     elem.hide('#download-instabug-plugin');
   }
@@ -86,7 +95,12 @@ function downloadExtension() {
   } else {
     url = false;
   }
-  window.open(url, '_blank');
+  if (url) {
+    window.open(url, '_blank');
+  } else {
+    const myWindow = window.open('', '_blank');
+    myWindow.document.write(`<h1>${translation.current.browserNotSupported}</h1>`);
+  }
 }
 
 
@@ -106,7 +120,6 @@ function addReportButton() {
  * initBugreportViews - insert all bugs reporting views into page dom
  */
 function initBugreportViews() {
-  const browserName = bugReport.getBrowserData().browserName;
   const instabugFormContainer = document.getElementById('instabugFormContainer');
 
   if (instabugFormContainer) return;
@@ -116,14 +129,10 @@ function initBugreportViews() {
   addLoadingWindow();
   addThankYouPage();
   if (!utils.isMobile()) {
-    if (!browserName.match(/unknown/ig)) {
-      if (!extension.isInstalled()) {
-        elem.show('#extensionPopUp');
-      } else {
-        extension.takeScreenShot();
-      }
-    } else if (elem.isExisted('#instabugFormContainer')) {
-      elem.show('#instabugFormContainer');
+    if (!extension.isInstalled()) {
+      elem.show('#extensionPopUp');
+    } else {
+      extension.takeScreenShot();
     }
   }
 }

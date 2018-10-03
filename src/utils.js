@@ -70,7 +70,26 @@ function dataURItoBlob(dataURI) {
   return new Blob([ia], { type: mimeString });
 }
 
+function assign(target, ...rest) {
+  const to = Object(target);
+
+  for (let index = 0; index < rest.length; index++) {
+    const nextSource = rest[index];
+    if (nextSource != null) {
+      const keys = Object.keys(nextSource);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (Object.prototype.hasOwnProperty.call(nextSource, key)) {
+          to[key] = nextSource[key];
+        }
+      }
+    }
+  }
+  return to;
+}
+
 module.exports = {
+  assign,
   shortifyTime,
   isMobile,
   sanitizeEmail,

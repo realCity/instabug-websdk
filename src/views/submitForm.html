@@ -1,6 +1,9 @@
 <form id="instabugForm">
   <h3>%title%</h3>
-  <p id="download-instabug-plugin"><a href="https://chrome.google.com/webstore/detail/instabug/gbhnbcggjeokebhgalmgkbhkabpjmnda">%downloadPlugin%</a></p>
+  <div id="download-instabug-plugin">
+    <p>%downloadPluginInfo%</p>
+  <button style="margin-bottom: 10px;" onclick="ibgSdk.downloadExtension()">%downloadPlugin%</button>
+  </div>
   <p>%hint%</p>
   <input
     id="email"
@@ -19,6 +22,7 @@
   <div>
     <p>%extraImage%</p>
     <input class="instabug-input" name="image" id="extra-image" type="file"/>
+    <p id="extra-image-error" style="background:red; display: none">%extraImageError%</p>
   </div>
 
   <button

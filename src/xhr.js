@@ -2,6 +2,8 @@
  * @module instabug-websdk/xhr
  */
 
+import utils from './utils';
+
 /**
  * @const
  * @default
@@ -21,7 +23,7 @@ const DEFAULTS = {
  * @param  {object} options request options
  */
 function executeXHR(options) {
-  const settings = Object.assign({}, DEFAULTS, options);
+  const settings = utils.assign({}, DEFAULTS, options);
 
   return new Promise((resolve, reject) => {
     const xhrObj = new XMLHttpRequest();

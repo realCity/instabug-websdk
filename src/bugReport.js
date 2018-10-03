@@ -7,7 +7,7 @@
 import elem from './element';
 import utils from './utils';
 import logs from './logs';
-import { xhr } from './xhr';
+import xhr from './xhr';
 
 /**
  * @const
@@ -98,7 +98,7 @@ function uploadCloudinary(file, filename, extra) {
     });
   }
 
-  return xhr({
+  return xhr.xhr({
     method: 'POST',
     url: `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
     body: formData,
@@ -106,7 +106,7 @@ function uploadCloudinary(file, filename, extra) {
       'X-Requested-With': 'XMLHttpRequest',
     },
     stringify: false,
-  });
+  }).catch(() => null);
 }
 
 function uploadExtraImage() {
@@ -168,10 +168,17 @@ function getBrowserData() {
 
   // browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
   if (nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)) {
-    browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
+    if (nVer.match(/Edge/g)) {
+      browserName = 'edge';
+    } else if (nVer.match(/Trident/g)) {
+      browserName = 'ie';
+    } else {
+      browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
+    }
   } else {
     browserName = 'Unknown';
   }
+
   let OSName = 'Unknown OS';
   if (nVer.indexOf('Win') !== -1) OSName = 'Windows';
   if (nVer.indexOf('Mac') !== -1) OSName = 'MacOS';
@@ -220,11 +227,19 @@ function prepareBugReport() {
 }
 
 function _prepareBugReportRequest(bugReportDetails, webHookURL) {
-  return xhr({
+  return xhr.xhr({
     method: 'POST',
     url: webHookURL,
     body: bugReportDetails,
     stringify: true,
+  });
+}
+
+function finallyPolyfill(promise, cb) {
+  promise.then(() => cb());
+  promise.catch((err) => {
+    cb();
+    throw err;
   });
 }
 
@@ -241,9 +256,9 @@ function submitBugReport() {
     uploads.push(uploadLogFile());
   }
 
-  Promise.all(uploads).then(([imageResponses, logUploadResponse]) => {
+  finallyPolyfill(Promise.all(uploads).then(([imageResponses, logUploadResponse]) => {
     bugReport.screenshots = imageResponses.map((response) => {
-      if (response.status === 'OK' && response.data && response.data.secure_url) {
+      if (response && response.status === 'OK' && response.data && response.data.secure_url) {
         return response.data.secure_url;
       }
       return response;
@@ -254,12 +269,11 @@ function submitBugReport() {
     if (logUploadResponse) {
       bugReport.networkLog = logUploadResponse.data && logUploadResponse.data.secure_url;
     }
-  }).finally(() => {
-    _prepareBugReportRequest(bugReport, zapierWebhookUrl)
-      .finally(() => {
-        elem.hide('#instabugLoading');
-        elem.show('#instabugThankYouPage');
-      });
+  }), () => {
+    finallyPolyfill(_prepareBugReportRequest(bugReport, zapierWebhookUrl), () => {
+      elem.hide('#instabugLoading');
+      elem.show('#instabugThankYouPage');
+    });
   });
 }
 

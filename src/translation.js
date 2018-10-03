@@ -1,9 +1,11 @@
 module.exports = {
   current: {
     title: 'Bug report',
-    downloadPlugin: 'Download the plugin for better screenshots!',
+    downloadPlugin: 'Download plugin',
+    downloadPluginInfo: 'Download the Instabug plugin for better screenshots!',
     hint: 'You can draw on the screen!',
     extraImage: 'Extra image',
+    extraImageError: 'The file is not an image!',
     submitBug: 'Submit Bug',
     cancel: 'Cancel',
     emailPlaceholder: 'Email',
@@ -13,5 +15,6 @@ module.exports = {
     thankYou: 'Thank You',
     reported: 'Your bug has been reported.',
     close: 'Close',
+    browserNotSupported: 'Browser not supported',
   },
 };

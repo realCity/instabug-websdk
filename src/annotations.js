@@ -3,6 +3,7 @@
  */
 
 import elem from './element';
+import utils from './utils';
 
 const drawingHistory = [];
 
@@ -106,14 +107,13 @@ function renderScreenshot(image) {
   elem.show('#instabugFormContainer');
 }
 
-
 /**
  * updateSettings - update drawing options object
  *
  * @param  {object} options drawing options object {size, color}
  */
 function updateSettings(options) {
-  drawingSettings = Object.assign({}, defaultDrawingOptions, options);
+  drawingSettings = utils.assign({}, defaultDrawingOptions, options);
 }
 
 

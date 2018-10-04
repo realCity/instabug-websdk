@@ -1,4 +1,3 @@
-
 /**
  * @module instabug-websdk/views
  */
@@ -24,11 +23,11 @@ function isImage(file) {
 }
 
 function addSubmitForm() {
-  const node = document.createElement('div');
+  const node = createDraggableDiv();
 
   node.setAttribute('class', 'ibgsdk-element instabug-window instabug-form');
   node.setAttribute('id', 'instabugFormContainer');
-  node.setAttribute('style', 'display:none;');
+  node.style.display = 'none';
 
   node.innerHTML = translate(submitFormView);
   document.body.appendChild(node);
@@ -134,6 +133,57 @@ function initBugreportViews() {
     } else {
       extension.takeScreenShot();
     }
+  }
+}
+
+function createDraggableDiv() {
+  const div = document.createElement('div');
+
+  let lastCursorX;
+  let lastCursorY;
+
+  div.onmousedown = dragMouseDown;
+  div.style.cursor = 'move';
+  div.style.width = '320px';
+
+  return div;
+
+  function dragMouseDown(e) {
+    const tagName = e.target.tagName;
+    if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'BUTTON') {
+      return;
+    }
+
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    lastCursorX = e.clientX;
+    lastCursorY = e.clientY;
+    document.addEventListener('mouseup', closeDragElement);
+    document.addEventListener('mousemove', elementDrag);
+  }
+
+  function elementDrag(e) {
+    e.preventDefault();
+    const moveX = lastCursorX - e.clientX;
+    const moveY = lastCursorY - e.clientY;
+    lastCursorX = e.clientX;
+    lastCursorY = e.clientY;
+
+    const targetX = div.offsetLeft - moveX;
+    const targetY = div.offsetTop - moveY;
+
+    const newX = Math.max(0, Math.min(window.innerWidth - 338, targetX));
+    const newY = Math.max(0, Math.min(window.innerHeight - 100, targetY));
+    lastCursorX += (newX - targetX);
+    lastCursorY += (newY - targetY);
+
+    div.style.left = `${newX}px`;
+    div.style.top = `${newY}px`;
+  }
+
+  function closeDragElement() {
+    document.removeEventListener('mouseup', closeDragElement);
+    document.removeEventListener('mousemove', elementDrag);
   }
 }
 

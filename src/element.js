@@ -9,7 +9,7 @@
  * @param  {string} query html element query selector
  */
 function hide(query) {
-  document.querySelector(query).setAttribute('style', 'display:none');
+  document.querySelector(query).style.display = 'none';
 }
 
 /**
@@ -18,7 +18,7 @@ function hide(query) {
  * @param  {string} query html element query selector
  */
 function show(query) {
-  document.querySelector(query).setAttribute('style', 'display:inline-block');
+  document.querySelector(query).style.display = 'inline-block';
 }
 
 

@@ -22,15 +22,18 @@ function isImage(file) {
   return file.name.match(/\.(png|gif|jpg|bmp|pdf)$/i);
 }
 
+const instabugWindow = createDraggableDiv();
+document.body.appendChild(instabugWindow);
+
 function addSubmitForm() {
-  const node = createDraggableDiv();
+  const node = document.createElement('div');
 
   node.setAttribute('class', 'ibgsdk-element instabug-window instabug-form');
   node.setAttribute('id', 'instabugFormContainer');
   node.style.display = 'none';
 
   node.innerHTML = translate(submitFormView);
-  document.body.appendChild(node);
+  instabugWindow.appendChild(node);
   const extraImage = document.getElementById('extra-image');
   extraImage.addEventListener('change', () => {
     const fileError = extraImage.files.length && !isImage(extraImage.files[0]);
@@ -43,7 +46,8 @@ function addSubmitForm() {
 
 function resetAndClose() {
   while (document.getElementsByClassName('ibgsdk-element').length) {
-    document.body.removeChild(document.getElementsByClassName('ibgsdk-element')[0]);
+    const element = document.getElementsByClassName('ibgsdk-element')[0];
+    element.parentNode.removeChild(element);
     elem.removeClass('body', 'u-disable-scrolling');
   }
 }
@@ -54,7 +58,7 @@ function addLoadingWindow() {
   node.setAttribute('id', 'instabugLoading');
   node.setAttribute('style', 'display:none;');
   node.innerHTML = translate(loadingWindowView);
-  document.body.appendChild(node);
+  instabugWindow.appendChild(node);
 }
 
 function addThankYouPage() {
@@ -63,7 +67,7 @@ function addThankYouPage() {
   node.setAttribute('id', 'instabugThankYouPage');
   node.setAttribute('style', 'display:none;');
   node.innerHTML = translate(ThankyouView);
-  document.body.appendChild(node);
+  instabugWindow.appendChild(node);
 }
 
 function addDownloadExtensionWindow() {
@@ -72,7 +76,7 @@ function addDownloadExtensionWindow() {
   node.setAttribute('id', 'extensionPopUp');
   node.setAttribute('style', 'display:none;');
   node.innerHTML = downloadExtensionView;
-  document.body.appendChild(node);
+  instabugWindow.appendChild(node);
 }
 
 function showSubmitView() {
@@ -111,7 +115,7 @@ function addReportButton() {
   const node = document.createElement('div');
   node.setAttribute('id', 'instabugSDK');
   node.innerHTML = '<a id="initInstaBugLink" onclick="ibgSdk.invoke()"></a>';
-  document.body.appendChild(node);
+  instabugWindow.appendChild(node);
 }
 
 
@@ -142,9 +146,14 @@ function createDraggableDiv() {
   let lastCursorX;
   let lastCursorY;
 
+  div.style.position = 'fixed';
+  div.style.zIndex = 1190000000;
   div.onmousedown = dragMouseDown;
   div.style.cursor = 'move';
-  div.style.width = '320px';
+  div.style.left = '360px';
+  div.style.top = '100px';
+
+  div.style.width = '340px';
 
   return div;
 

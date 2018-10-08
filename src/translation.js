@@ -16,5 +16,6 @@ module.exports = {
     reported: 'Your bug has been reported.',
     close: 'Close',
     browserNotSupported: 'Browser not supported',
+    pluginNotDownloadable: 'Instabug plugin not available.',
   },
 };

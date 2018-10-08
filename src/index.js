@@ -59,14 +59,18 @@ function initSDK(options) {
     extension.setHtml2canvas(options.html2canvas);
   }
 
-  // domReady(() => {
-  //   views.addReportButton();
-  //   element.hide('#instabugSDK');
-  // });
-  //
-  // domReady(() => {
-  //   element.show('#instabugSDK');
-  // });
+  document.body.addEventListener('keydown', (e) => {
+    if (e.which === 85 && e.ctrlKey) {
+      e.preventDefault();
+      sdk.invoke();
+    }
+  });
+
+  setInterval(() => {
+    if (document.activeElement === null) { // IE fix
+      document.body.focus();
+    }
+  }, 100);
 }
 
 

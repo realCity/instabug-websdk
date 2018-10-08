@@ -46,6 +46,11 @@ function addSubmitForm() {
   });
   if (extension.pluginIsInstalled()) {
     elem.hide('#download-instabug-plugin');
+    elem.hide('#plugin-not-downloadable');
+  } else if (getDownloadUrl()) {
+    elem.hide('#plugin-not-downloadable');
+  } else {
+    elem.hide('#download-instabug-plugin');
   }
 }
 
@@ -91,26 +96,23 @@ function showSubmitView() {
   elem.show('#instabugFormContainer');
 }
 
-function downloadExtension(event) {
-  event.preventDefault();
-  let url;
+function getDownloadUrl() {
   const browserName = bugReport.getBrowserData().browserName;
   if (browserName.match(/safari/ig)) {
-    url = 'https://s3.amazonaws.com/instabug-pro/extensions/safari.safariextz';
-  } else if (browserName.match(/chrome/ig)) {
-    url = 'https://chrome.google.com/webstore/detail/gbhnbcggjeokebhgalmgkbhkabpjmnda/';
-  } else if (browserName.match(/firefox/ig)) {
-    url = 'https://addons.mozilla.org/en-US/firefox/addon/instabug/';
-  } else {
-    url = false;
+    return 'https://s3.amazonaws.com/instabug-pro/extensions/safari.safariextz';
   }
-  if (url) {
-    window.open(url, '_blank');
-  } else {
-    const myWindow = window.open('', '_blank');
-    myWindow.document.write(`<h1>${translation.current.browserNotSupported}</h1>`);
-    myWindow.document.close();
+  if (browserName.match(/chrome/ig)) {
+    return 'https://chrome.google.com/webstore/detail/gbhnbcggjeokebhgalmgkbhkabpjmnda/';
   }
+  if (browserName.match(/firefox/ig)) {
+    return 'https://addons.mozilla.org/en-US/firefox/addon/instabug/';
+  }
+  return null;
+}
+
+function downloadExtension(event) {
+  event.preventDefault();
+  window.open(getDownloadUrl(), '_blank');
 }
 
 

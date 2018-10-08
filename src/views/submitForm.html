@@ -2,7 +2,7 @@
   <h3>%title%</h3>
   <div id="download-instabug-plugin">
     <p>%downloadPluginInfo%</p>
-  <button style="margin-bottom: 10px;" onclick="ibgSdk.downloadExtension()">%downloadPlugin%</button>
+  <button style="margin-bottom: 10px;" onclick="ibgSdk.downloadExtension(event)">%downloadPlugin%</button>
   </div>
   <p>%hint%</p>
   <input
@@ -21,11 +21,11 @@
   cols="30"></textarea>
   <div>
     <p>%extraImage%</p>
-    <input class="instabug-input" name="image" id="extra-image" type="file"/>
+    <input style="display: block" name="image" id="extra-image" type="file"/>
     <p id="extra-image-error" style="background:red; display: none">%extraImageError%</p>
   </div>
 
-  <button
+  <button id="submit-bugreport" disabled="disabled"
     type="button"
     onclick="ibgSdk.submitReport()">
     %submitBug%

@@ -167,7 +167,7 @@ function getBrowserData() {
   let browserName = navigator.appName;
 
   // browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
-  if (nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)) {
+  if (nVer.match(/(firefox|msie|chrome|safari|trident)[/\s]([\d.]+)/ig)) {
     if (nVer.match(/Edge/g)) {
       browserName = 'edge';
     } else if (nVer.match(/Trident/g)) {
@@ -177,6 +177,9 @@ function getBrowserData() {
     }
   } else {
     browserName = 'Unknown';
+    if (navigator.userAgent.match(/firefox/ig)) {
+      browserName = 'firefox';
+    }
   }
 
   let OSName = 'Unknown OS';

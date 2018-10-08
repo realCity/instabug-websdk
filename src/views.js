@@ -18,8 +18,8 @@ function translate(html) {
   return html.replace(/%([^%]*)%/g, (all, prop) => translation.current[prop]);
 }
 
-function isImage(file) {
-  return file.name.match(/\.(png|gif|jpg|bmp|pdf)$/i);
+function isUploadable(file) {
+  return file.name.match(/\.(png|gif|jpg|bmp|pdf)$/i) && file.size <= 10485760;
 }
 
 const instabugWindow = createDraggableDiv();
@@ -36,8 +36,13 @@ function addSubmitForm() {
   instabugWindow.appendChild(node);
   const extraImage = document.getElementById('extra-image');
   extraImage.addEventListener('change', () => {
-    const fileError = extraImage.files.length && !isImage(extraImage.files[0]);
-    document.getElementById('extra-image-error').style.display = fileError ? null : 'none';
+    const fileError = extraImage.files.length && !isUploadable(extraImage.files[0]);
+    document.getElementById('extra-image-error').style.display = fileError ? '' : 'none';
+  });
+  const comment = document.getElementById('comment');
+  comment.addEventListener('input', () => {
+    const valid = comment.value.length > 0;
+    document.getElementById('submit-bugreport').disabled = !valid;
   });
   if (extension.pluginIsInstalled()) {
     elem.hide('#download-instabug-plugin');
@@ -86,7 +91,8 @@ function showSubmitView() {
   elem.show('#instabugFormContainer');
 }
 
-function downloadExtension() {
+function downloadExtension(event) {
+  event.preventDefault();
   let url;
   const browserName = bugReport.getBrowserData().browserName;
   if (browserName.match(/safari/ig)) {
@@ -103,6 +109,7 @@ function downloadExtension() {
   } else {
     const myWindow = window.open('', '_blank');
     myWindow.document.write(`<h1>${translation.current.browserNotSupported}</h1>`);
+    myWindow.document.close();
   }
 }
 

@@ -5,7 +5,7 @@ module.exports = {
     downloadPluginInfo: 'Download the Instabug plugin for better screenshots!',
     hint: 'You can draw on the screen!',
     extraImage: 'Extra image',
-    extraImageError: 'The file is not an image!',
+    extraImageError: 'The file is not an image or file size is larger than 10 MB!',
     submitBug: 'Submit Bug',
     cancel: 'Cancel',
     emailPlaceholder: 'Email',

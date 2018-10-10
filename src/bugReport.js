@@ -142,7 +142,7 @@ function uploadBugImages() {
  */
 function getMemoryUsed() {
   let output;
-  if (window.performance.memory) {
+  if (window.performance && window.performance.memory) {
     const memory = window.performance.memory;
     output = {
       used: memory.usedJSHeapSize / 1000000,
@@ -167,11 +167,13 @@ function getBrowserData() {
   let browserName = navigator.appName;
 
   // browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
-  if (nVer.match(/(firefox|msie|chrome|safari|trident)[/\s]([\d.]+)/ig)) {
+  if (nVer.match(/(firefox|msie|chrome|safari|opr|trident)[/\s]([\d.]+)/ig)) {
     if (nVer.match(/Edge/g)) {
       browserName = 'edge';
     } else if (nVer.match(/Trident/g)) {
       browserName = 'ie';
+    } else if (nVer.match(/opr/ig)) {
+      browserName = nVer.match(/(opr)[/\s]([\d.]+)/ig)[0];
     } else {
       browserName = nVer.match(/(firefox|msie|chrome|safari)[/\s]([\d.]+)/ig)[0];
     }

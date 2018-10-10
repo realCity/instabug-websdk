@@ -101,7 +101,7 @@ function getDownloadUrl() {
   if (browserName.match(/safari/ig)) {
     return 'https://s3.amazonaws.com/instabug-pro/extensions/safari.safariextz';
   }
-  if (browserName.match(/chrome/ig)) {
+  if (browserName.match(/chrome/ig) || browserName.match(/opera/ig)) {
     return 'https://chrome.google.com/webstore/detail/gbhnbcggjeokebhgalmgkbhkabpjmnda/';
   }
   if (browserName.match(/firefox/ig)) {

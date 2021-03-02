@@ -88,7 +88,6 @@ function uploadCloudinary(file, filename, extra) {
   const cloudName = IntegrationData.cloudinaryCloudName;
   const uploadPreset = IntegrationData.cloudinaryUploadPreset;
 
-  formData.append('metadata[file_type]', 'main-screenshot');
   formData.append('file', file, filename);
   formData.append('upload_preset', uploadPreset);
   formData.append('tags', 'instabug_screenshot');

@@ -44,7 +44,7 @@ function addSubmitForm() {
     const valid = comment.value.length > 0;
     document.getElementById('submit-bugreport').disabled = !valid;
   });
-  if (extension.pluginIsInstalled()) {
+  if (extension.pluginIsInstalled() || !extension.offerDownloadPlugin) {
     elem.hide('#download-instabug-plugin');
     elem.hide('#plugin-not-downloadable');
   } else if (getDownloadUrl()) {

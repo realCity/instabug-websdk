@@ -68,4 +68,5 @@ module.exports = {
   pluginIsInstalled,
   takeScreenShot,
   setHtml2canvas,
+  offerDownloadPlugin: true,
 };

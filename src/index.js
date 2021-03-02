@@ -58,6 +58,7 @@ function initSDK(options) {
   if (options.html2canvas) {
     extension.setHtml2canvas(options.html2canvas);
   }
+  extension.offerDownloadPlugin = options.offerDownloadPlugin;
 
   document.body.addEventListener('keydown', (e) => {
     if (e.which === 85 && e.ctrlKey) {

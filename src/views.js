@@ -34,14 +34,32 @@ function addSubmitForm() {
 
   node.innerHTML = translate(submitFormView);
   instabugWindow.appendChild(node);
+
   const extraImage = document.getElementById('extra-image');
   extraImage.addEventListener('change', () => {
     const fileError = extraImage.files.length && !isUploadable(extraImage.files[0]);
     document.getElementById('extra-image-error').style.display = fileError ? '' : 'none';
   });
   const comment = document.getElementById('comment');
+  const commentLength = document.getElementById('comment-length');
+
+  const updateCommentLength = () => {
+    if (extension.descriptionMaxLength) {
+      if (comment.value.length > extension.descriptionMaxLength) {
+        comment.value = comment.value.substring(0, extension.descriptionMaxLength);
+      }
+
+      commentLength.innerText = `${translation.current.remainingCharacters}: ${extension.descriptionMaxLength - comment.value.length}`;
+    }
+  };
+  updateCommentLength();
+
   comment.addEventListener('input', () => {
-    const valid = comment.value.length > 0;
+    updateCommentLength();
+    let valid = comment.value.length > 0;
+    if (extension.descriptionMaxLength && comment.value.length > extension.descriptionMaxLength) {
+      valid = false;
+    }
     document.getElementById('submit-bugreport').disabled = !valid;
   });
   if (extension.pluginIsInstalled() || !extension.offerDownloadPlugin) {

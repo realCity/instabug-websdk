@@ -17,5 +17,6 @@ module.exports = {
     close: 'Close',
     browserNotSupported: 'Browser not supported',
     pluginNotDownloadable: 'Instabug plugin not available.',
+    remainingCharacters: 'Remaining characters',
   },
 };

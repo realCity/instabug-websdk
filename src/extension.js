@@ -69,4 +69,5 @@ module.exports = {
   takeScreenShot,
   setHtml2canvas,
   offerDownloadPlugin: true,
+  descriptionMaxLength: 0,
 };

@@ -59,6 +59,7 @@ function initSDK(options) {
     extension.setHtml2canvas(options.html2canvas);
   }
   extension.offerDownloadPlugin = options.offerDownloadPlugin;
+  extension.descriptionMaxLength = options.descriptionMaxLength;
 
   document.body.addEventListener('keydown', (e) => {
     if (e.which === 85 && e.ctrlKey) {
